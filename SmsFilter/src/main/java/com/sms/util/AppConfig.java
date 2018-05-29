@@ -5,34 +5,44 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.jms.Queue;
+import javax.validation.constraints.NotNull;
 
-import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.commons.dbcp.BasicDataSource;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.support.converter.MappingJackson2MessageConverter;
 import org.springframework.jms.support.converter.MessageConverter;
 import org.springframework.jms.support.converter.MessageType;
 
+import com.sms.client.ClientService;
+
 @Configuration
+@ConfigurationProperties(prefix = "app")
 public class AppConfig {
 
-	public static final String HELLO_QUEUE = "hello.queue";
+	@NotNull
+	private boolean activateConsumer;
 
-	@Bean
-	public Queue helloJMSQueue() {
-		return new ActiveMQQueue(HELLO_QUEUE);
+	@NotNull
+	private List<String> urls = new ArrayList<String>();
+
+	public List<String> getUrls() {
+		return urls;
 	}
 
-	@Bean
-	public List<String> urlsList() {
-		List<String> urlsList = new ArrayList<String>();
-		urlsList.add("http://127.0.0.0/receivesms.php?from=<from>&to=<to>&text=<text>");
-		urlsList.add("http://127.0.0.1/receivesms.php?from=<from>&to=<to>&text=<text>");
-		urlsList.add("http://127.0.0.2/receivesms.php?from=<from>&to=<to>&text=<text>");
-		urlsList.add("http://127.0.0.3/receivesms.php?from=<from>&to=<to>&text=<text>");
-		urlsList.add("http://127.0.0.4/receivesms.php?from=<from>&to=<to>&text=<text>");
-		return urlsList;
+	public void setUrls(List<String> urls) {
+		this.urls = urls;
+	}
+
+	public boolean isActivateConsumer() {
+		return activateConsumer;
+	}
+
+	public void setActivateConsumer(boolean activateConsumer) {
+		this.activateConsumer = activateConsumer;
 	}
 
 	@Bean
@@ -47,4 +57,28 @@ public class AppConfig {
 		converter.setTypeIdPropertyName("_type");
 		return converter;
 	}
+
+	@Bean(name = "clientService")
+	public ClientService clientService(@Value("${client.datasource.url}") String clientDbUrl,
+			@Value("${client.datasource.driver-class-name}") String clientDbDriver,
+			@Value("${client.datasource.username}") String clientDbUser,
+			@Value("${client.datasource.password}") String clientDbPass,
+			@Value("${client.datasource.max}") int clientDbMaxConn,
+			@Value("${client.datasource.min}") int clientDbMinConn) {
+		System.out.println("clientDbUrl" + clientDbUrl);
+		BasicDataSource dataSource = new BasicDataSource();
+		dataSource.setDriverClassName(clientDbDriver);
+		dataSource.setUrl(clientDbUrl);
+		dataSource.setUsername(clientDbUser);
+		dataSource.setPassword(clientDbPass);
+		dataSource.setMaxActive(clientDbMaxConn);
+		dataSource.setInitialSize(clientDbMinConn);
+		/*
+		 * dataSource.setValidationQuery("select NOW()");
+		 * dataSource.setTestOnBorrow(true);
+		 */
+
+		return new ClientService(dataSource);
+	}
+
 }

@@ -17,7 +17,7 @@ public class JmsConsumer implements Runnable {
 
 	@Autowired
 	RequestService requestService;
-	
+
 	@Value("${jms.queue.destination}")
 	String destinationQueue;
 	private final Logger logger = LoggerFactory.getLogger(JmsClient.class);
@@ -33,7 +33,7 @@ public class JmsConsumer implements Runnable {
 		while (isRunning) {
 			Request request = (Request) jmsTemplate.receiveAndConvert(destinationQueue);
 			logger.info(request.toString());
-			requestService.action(request);
+			requestService.service(request);
 		}
 		logger.info(Thread.currentThread().getName() + " Thread Stopped");
 	}

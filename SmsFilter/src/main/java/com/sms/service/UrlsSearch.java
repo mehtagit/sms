@@ -1,7 +1,5 @@
 package com.sms.service;
 
-import com.sms.bean.Request;
-
-public interface Urls {
+public interface UrlsSearch {
 	public String getUrl();
 }

@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.bean.Request;
 import com.sms.jms.JmsClient;
+import com.sms.service.RequestService;
+import com.sms.util.AppConfig;
+import com.sms.util.ApplicationContextProvider;
 import com.sms.util.Utility;
 
 @RestController
@@ -25,13 +28,15 @@ public class RequestController {
 	@Autowired
 	private Utility utility;
 
+	@Autowired
+	private RequestService requestService;
 	private final Logger logger = LoggerFactory.getLogger(RequestController.class);
 
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public ResponseEntity<?> getRequest(@RequestParam String from, @RequestParam String to,
 			@RequestParam String messageId, @RequestParam String deliveryMask, @RequestParam String message,
 			@RequestParam String forward, @RequestParam String fdaId) {
-		Request request = new Request();
+		Request request = ApplicationContextProvider.getBean(Request.class);
 		request.setTid(utility.getUniqeTid());
 		request.setFromMsisdn(from);
 		request.setToMsisdn(to);
@@ -40,7 +45,9 @@ public class RequestController {
 		request.setDeliveryMask(deliveryMask);
 		request.setForwardMsisdn(forward);
 		request.setFdaId(fdaId);
-		jsmClient.send(request);
+		logger.info("Received " + request);
+		// jsmClient.send(request);
+		requestService.service(request);
 		return new ResponseEntity<Request>(request, HttpStatus.OK);
 	}
 
@@ -51,14 +58,24 @@ public class RequestController {
 
 	@RequestMapping(value = "/start", method = RequestMethod.GET)
 	public ResponseEntity<?> start() {
-		jsmClient.start();
-		return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+		boolean activateConsumer = ApplicationContextProvider.getBean(AppConfig.class).isActivateConsumer();
+		if (activateConsumer) {
+			jsmClient.start();
+			return new ResponseEntity<String>("Consumer Started", HttpStatus.ACCEPTED);
+		} else {
+			return new ResponseEntity<String>("Consumer didn't activated", HttpStatus.NOT_IMPLEMENTED);
+		}
 	}
 
 	@RequestMapping(value = "/stop", method = RequestMethod.GET)
 	public ResponseEntity<?> stop() {
-		jsmClient.stop();
-		return new ResponseEntity<Void>(HttpStatus.ACCEPTED);
+		boolean activateConsumer = ApplicationContextProvider.getBean(AppConfig.class).isActivateConsumer();
+		if (activateConsumer) {
+			jsmClient.stop();
+			return new ResponseEntity<String>("Consumer Stoped", HttpStatus.ACCEPTED);
+		} else {
+			return new ResponseEntity<String>("Consumer didn't activated", HttpStatus.NOT_IMPLEMENTED);
+		}
 	}
 
 	@RequestMapping(value = "", method = RequestMethod.POST)

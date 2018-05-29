@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import com.sms.bean.Request;
 import com.sms.client.ClientService;
 import com.sms.controller.RequestController;
-import com.sms.util.Profile;
+import com.sms.repository.RequestRepository;
 import com.sms.util.Utility;
 
 @Service
@@ -23,31 +23,25 @@ public class RequestService {
 	ClientService clientService;
 
 	@Autowired
-	@Resource(name = "urls")
-	Urls urls;
+	@Resource(name = "urlsSearch")
+	UrlsSearch urlsSearch;
 
 	@Autowired
 	Utility utility;
 
 	private final Logger logger = LoggerFactory.getLogger(RequestController.class);
 
-	private void setProfile(Request request) {
-		request.setProfile(Profile.WhiteList);
-
-		logger.info("Found Profile" + request);
-	}
-
-	public void save(Request request) {
+	private void save(Request request) {
 		requestRepository.save(request);
 		logger.info("Saved in DB " + request);
 	}
 
-	public void delete(Request request) {
+	private void delete(Request request) {
 		requestRepository.delete(request);
 		logger.info("Deleted from DB " + request);
 	}
 
-	public void action(Request request) {
+	public void service(Request request) {
 		save(request);
 
 		clientService.checkProfile(request);
@@ -59,13 +53,13 @@ public class RequestService {
 			delete(request);
 			break;
 		case WhiteList:
-			url = urls.getUrl();
+			url = urlsSearch.getUrl();
 			url = url.replaceAll("<from>", request.getFromMsisdn());
 			url = url.replaceAll("<to>", request.getToMsisdn());
 			url = url.replaceAll("<text>", request.getMessage());
 			break;
 		case Graylist:
-			url = urls.getUrl();
+			url = urlsSearch.getUrl();
 			url = url.replaceAll("<from>", request.getFromMsisdn());
 			url = url.replaceAll("<to>", request.getForwardMsisdn());
 			url = url.replaceAll("<text>", request.getMessage());
@@ -75,7 +69,11 @@ public class RequestService {
 		if (url != null) {
 			logger.info("URL : " + url + request);
 			// utility.callUrl(url);
-			delete(request);
+			if ("Y".equalsIgnoreCase(request.getDeliveryMask())) {
+				logger.info("Waiting for delivery " + request);
+			} else {
+				delete(request);
+			}
 		}
 	}
 

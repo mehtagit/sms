@@ -2,35 +2,35 @@ package com.sms.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sms.bean.Delivery;
-import com.sms.bean.Request;
+import com.sms.service.DeliveryService;
+import com.sms.util.ApplicationContextProvider;
 
 @RestController
 @RequestMapping("/sms/delivery")
 public class DeliveryController {
 
+	@Autowired
+	private DeliveryService deliveryService;
+
 	private final Logger logger = LoggerFactory.getLogger(DeliveryController.class);
 
-	// -------------------Create a User-------------------------------------------
-
-	@RequestMapping(value = "/", method = RequestMethod.POST)
-	public ResponseEntity<?> getRequest(@RequestBody Delivery delivery) {
-		logger.info("Creating User : {}", delivery);
-
-		/*
-		 * HttpHeaders headers = new HttpHeaders();
-		 * headers.setLocation(ucBuilder.path("/api/user/{id}").buildAndExpand(user.
-		 * getId()).toUri()); return new ResponseEntity<String>(headers,
-		 * HttpStatus.CREATED);
-		 */
-		return new ResponseEntity<Delivery>(delivery, HttpStatus.CREATED);
+	@RequestMapping(value = "", method = RequestMethod.GET)
+	public ResponseEntity<?> getDelivery(@RequestParam String tid, @RequestParam String messageId) {
+		Delivery delivery = ApplicationContextProvider.getBean(Delivery.class);
+		delivery.setTid(tid);
+		delivery.setMessageId(messageId);
+		logger.info("Received " + delivery);
+		deliveryService.delete(delivery);
+		return new ResponseEntity<Void>(HttpStatus.OK);
 	}
 
 }

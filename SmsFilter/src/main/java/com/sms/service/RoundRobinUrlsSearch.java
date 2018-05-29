@@ -1,19 +1,17 @@
 package com.sms.service;
 
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Resource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component("urls")
-public class RoundRobinUrls implements Urls {
+import com.sms.util.AppConfig;
+
+@Component("urlsSearch")
+public class RoundRobinUrlsSearch implements UrlsSearch {
 
 	@Autowired
-	@Resource(name = "urlsList")
-	private List<String> urlsList;
+	private AppConfig appConfig;
 
 	private AtomicInteger index = new AtomicInteger(0);
 
@@ -22,11 +20,9 @@ public class RoundRobinUrls implements Urls {
 	}
 
 	public String get() {
-
-		if (index.get() > urlsList.size()) {
+		if (index.get() > appConfig.getUrls().size()) {
 			index.set(0);
 		}
-
-		return urlsList.get(index.getAndIncrement());
+		return appConfig.getUrls().get(index.getAndIncrement());
 	}
 }
