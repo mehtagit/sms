@@ -6,16 +6,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.jdbc.core.SqlOutParameter;
 import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import com.sms.bean.Request;
+import com.sms.controller.DeliveryController;
 import com.sms.util.Profile;
 
 public class ClientService {
 
 	private SimpleJdbcCall jdbcCall;
+	private Logger logger = LogManager.getLogger(DeliveryController.class);
 
 	public ClientService(BasicDataSource clientDataSource) {
 		this.jdbcCall = new SimpleJdbcCall(clientDataSource).withProcedureName("getcallScreening");

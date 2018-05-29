@@ -1,14 +1,15 @@
 package com.sms.jms;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Component;
 
 import com.sms.bean.Request;
+import com.sms.controller.DeliveryController;
 import com.sms.service.RequestService;
+import com.sms.util.AppConfig;
 
 @Component
 public class JmsConsumer implements Runnable {
@@ -18,20 +19,21 @@ public class JmsConsumer implements Runnable {
 	@Autowired
 	RequestService requestService;
 
-	@Value("${jms.queue.destination}")
-	String destinationQueue;
-	private final Logger logger = LoggerFactory.getLogger(JmsClient.class);
+	@Autowired
+	private AppConfig appConfig;
+
+	private Logger logger = LogManager.getLogger(JmsConsumer.class);
 
 	private boolean isRunning;
 
 	public Request receive() {
-		return (Request) jmsTemplate.receiveAndConvert(destinationQueue);
+		return (Request) jmsTemplate.receiveAndConvert(appConfig.getJmsQueue());
 	}
 
 	public void run() {
 		isRunning = true;
 		while (isRunning) {
-			Request request = (Request) jmsTemplate.receiveAndConvert(destinationQueue);
+			Request request = receive();
 			logger.info(request.toString());
 			requestService.service(request);
 		}

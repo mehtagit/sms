@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Properties>
+		<Property name="basePath">f:/</Property>
+	</Properties>
+
+	<Appenders>
+		<RollingFile name="fileAppender" fileName="${basePath}/sms.log"
+			filePattern="${basePath}/sms.log-%d{yyyy-MM-dd-HH}.%i">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}|%-5level|%t,%c{1}| %msg%n" />
+			<Policies>
+				<SizeBasedTriggeringPolicy size="2 GB" />
+				<!--TimeBasedTriggeringPolicy interval="1" modulate="true"/ -->
+				<TimeBasedTriggeringPolicy />
+			</Policies>
+			<DefaultRolloverStrategy max="50" />
+		</RollingFile>
+
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}|%-5level|%t,%c{1}| %msg%n" />
+		</Console>
+		<!-- SMTP Appender -->
+		<SMTP name="MailAppender" subject="Log4j2 Demo [PROD]" to="youremail@example.com"
+			from="log4j2-demo-alerts@example.com" smtpHost="yourSMTPHost"
+			smtpPort="587" smtpUsername="yourSMTPUsername" smtpPassword="yourSMTPPassword"
+			bufferSize="1">
+			<ThresholdFilter level="ERROR" onMatch="ACCEPT"
+				onMismatch="DENY" />
+			<PatternLayout>
+				<Pattern>${LOG_PATTERN}</Pattern>
+			</PatternLayout>
+		</SMTP>
+	</Appenders>
+	<Loggers>
+		<!-- <Logger name="mcarbon.io" level="info" additivity="false"> <AppenderRef 
+			ref="fileAppender" /> </Logger> -->
+
+		<Root level="debug" additivity="false">
+		<!-- 	<appender-ref ref="console" /> -->
+			<appender-ref ref="fileAppender" />
+		</Root>
+	</Loggers>
+</Configuration>

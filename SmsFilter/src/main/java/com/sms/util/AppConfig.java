@@ -27,6 +27,9 @@ public class AppConfig {
 	private boolean activateConsumer;
 
 	@NotNull
+	private String jmsQueue;
+
+	@NotNull
 	private List<String> urls = new ArrayList<String>();
 
 	public List<String> getUrls() {
@@ -35,6 +38,14 @@ public class AppConfig {
 
 	public void setUrls(List<String> urls) {
 		this.urls = urls;
+	}
+
+	public String getJmsQueue() {
+		return jmsQueue;
+	}
+
+	public void setJmsQueue(String jmsQueue) {
+		this.jmsQueue = jmsQueue;
 	}
 
 	public boolean isActivateConsumer() {

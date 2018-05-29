@@ -2,14 +2,13 @@ package com.sms.service;
 
 import javax.annotation.Resource;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sms.bean.Request;
 import com.sms.client.ClientService;
-import com.sms.controller.RequestController;
 import com.sms.repository.RequestRepository;
 import com.sms.util.Utility;
 
@@ -29,7 +28,7 @@ public class RequestService {
 	@Autowired
 	Utility utility;
 
-	private final Logger logger = LoggerFactory.getLogger(RequestController.class);
+	private  final Logger logger = LogManager.getLogger(RequestService.class);
 
 	private void save(Request request) {
 		requestRepository.save(request);

@@ -3,7 +3,6 @@ package com.sms.util;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.Type;
 import java.net.ConnectException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -16,18 +15,19 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import com.sms.controller.RequestController;
 
 @Component("utility")
 public class Utility {
 
-	public static final Logger logger = LoggerFactory.getLogger(Utility.class);
+	private Logger logger = LogManager.getLogger(Utility.class);
 
 	@Autowired
 	private DatagramSocket clientSocket;
