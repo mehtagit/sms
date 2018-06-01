@@ -21,17 +21,6 @@
 			<PatternLayout
 				pattern="%d{yyyy-MM-dd HH:mm:ss,SSS}|%-5level|%t,%c{1}| %msg%n" />
 		</Console>
-		<!-- SMTP Appender -->
-		<SMTP name="MailAppender" subject="Log4j2 Demo [PROD]" to="youremail@example.com"
-			from="log4j2-demo-alerts@example.com" smtpHost="yourSMTPHost"
-			smtpPort="587" smtpUsername="yourSMTPUsername" smtpPassword="yourSMTPPassword"
-			bufferSize="1">
-			<ThresholdFilter level="ERROR" onMatch="ACCEPT"
-				onMismatch="DENY" />
-			<PatternLayout>
-				<Pattern>${LOG_PATTERN}</Pattern>
-			</PatternLayout>
-		</SMTP>
 	</Appenders>
 	<Loggers>
 		<!-- <Logger name="mcarbon.io" level="info" additivity="false"> <AppenderRef 
